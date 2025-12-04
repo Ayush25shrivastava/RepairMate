@@ -4,10 +4,12 @@ import bcrypt from 'bcrypt';
 EngineerSchema=new mongoose.Schema({
     name:{type:String,required:true,trim:true},
     email:{type:String,required:true,trim:true,unique:true,lowercase:true},
-    phone:{type:Number},
+    phone:{type:Number,required:true},
     password:{type:String,required:true},
     role:{type:String,enum:["admin","user","engineer"]},
     departmentId:{type:mongoose.Schema.Types.ObjectId, ref:"department"},
+    status:{type:{type:string}},
+    loadfactor:{type:string},
     ratings: {
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
