@@ -25,5 +25,5 @@ EngineerSchema.pre('save',async function hash(password) {
 EngineerSchema.methods.comparePassword = function comparePassword(candidate) {
     return bcrypt.compare(candidate, this.password);
 };
-const Engineer=EngineerSchema.model('User',EngineerSchema);
+const Engineer=EngineerSchema.model('Engineer',EngineerSchema);
 export default Engineer;
