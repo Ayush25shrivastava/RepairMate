@@ -23,6 +23,7 @@ const IssueSchema=new mongoose.Schema({
     required: true 
     },
     
-})
+    
+},{timestamps:true})
 const Issue=IssueSchema.model('Issue',IssueSchema);
 export default Issue;

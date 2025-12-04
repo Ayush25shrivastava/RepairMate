@@ -8,7 +8,7 @@ EngineerSchema=new mongoose.Schema({
     password:{type:String,required:true},
     role:{type:String,enum:["admin","user","engineer"]},
     departmentId:{type:mongoose.Schema.Types.ObjectId, ref:"department"},
-    status:{type:{type:string}},
+    oncallstatus:{type:{type:string}},
     loadfactor:{type:string},
     ratings: {
         average: { type: Number, default: 0 },
