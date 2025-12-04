@@ -25,5 +25,29 @@ EngineerSchema.pre('save',async function hash(password) {
 EngineerSchema.methods.comparePassword = function comparePassword(candidate) {
     return bcrypt.compare(candidate, this.password);
 };
+EngineerSchema.methods.generateAccessToken=function(){
+    return jwt.sign({
+        _id:this.id,
+        username:this.UserName,
+        email:this.email
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+        expiresIn:process.env.ACCESS_TOKEN_EXPIRY,
+    },
+    )
+}
+EngineerSchema.methods.generateRefreshToken=function(){
+    return jwt.sign({
+        _id:this.id,
+
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+        expiresIn:process.env.REFRESH_TOKEN_EXPIRY
+    },
+    )
+    
+}
 const Engineer=EngineerSchema.model('Engineer',EngineerSchema);
 export default Engineer;
