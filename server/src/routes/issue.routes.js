@@ -16,7 +16,9 @@ import {
     authorizeIssueOwner,
     authorizeIssueAccess,
     authorizeAssignedEngineer
+    
 } from "../middlewares/rbac.middleware.js";
+import { upload } from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
@@ -24,7 +26,7 @@ const router = Router();
 router.use(verifyJWT);
 
 
-router.post("/", authorizeRoles("user"), createIssue);
+router.post("/create", authorizeRoles("user"),upload.single("attachment"), createIssue);
 
 
 router.get("/", authorizeRoles("admin"), getAllIssues);

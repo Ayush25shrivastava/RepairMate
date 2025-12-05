@@ -3,21 +3,52 @@ import Issue from "../models/Issue.model.js";
 import { ApiError } from "../utility/ApiError.js";
 import { ApiResponse } from "../utility/ApiResponse.js";
 
+import fs from "fs"
+import { getImageKit } from "../config/imagekit.js";
+
 
 const createIssue = asynchandler(async (req, res) => {
-    const { title, description, location, attachment, priority, type } = req.body;
+    console.log(req.body);
 
+    const { title, description, location, priority, type } = req.body;
+    if (!title) {
+        console.log("title havent fetched")
+    }
 
     if (!title || !description) {
         throw new ApiError(400, "Title and description are required");
     }
+    let imageFileId = null;
+    let imageUrl = null;
 
+    if (req.file) {
+        try {
+            console.log("Uploading file:", req.file.path);
+            const uploadedResponse = await getImageKit().upload({
+                file: fs.readFileSync(req.file.path),
+                fileName: `issue-${Date.now()}`,
+                folder: `/zordan`
+            });
+            console.log("Upload success:", uploadedResponse);
+            imageUrl = uploadedResponse.url;
+            imageFileId = uploadedResponse.fileId;
+            fs.unlinkSync(req.file.path);
+
+        } catch (uploadError) {
+            console.error("ImageKit upload error:", uploadError);
+
+            if (fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            throw new ApiError(500, "Failed to upload image: " + uploadError.message);
+        }
+    }
 
     const issue = await Issue.create({
         title,
         description,
         location: location || {},
-        attachment,
+        attachment: imageUrl || null,
         priority: priority || 'MEDIUM',
         type: type || 'OTHER',
         user: req.user._id,
