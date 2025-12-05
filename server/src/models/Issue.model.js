@@ -1,29 +1,49 @@
 import mongoose from "mongoose";
-const IssueSchema=new mongoose.Schema({
-    title:{type:String,required:true},
-    description:{type:string,required:true},
+
+const IssueSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
     location: {
-    name: { type: String, required: false }, 
-    attachment:{type:string,type:required},
-    priority: { type: String },
-    type: { type: String },
-    status: { type: String  },
+        name: { type: String, required: false },
     },
-    slaTargetResolutionDate: { type: Date, default: null }, 
-    slaStatus: { 
-    type: String, 
-    enum: ['IN_COMPLIANCE', 'WARNING', 'BREACHED', 'EXEMPT'], 
-    default: 'EXEMPT' 
+    attachment: { type: String },
+    priority: {
+        type: String,
+        enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+        default: 'MEDIUM'
+    },
+    type: {
+        type: String,
+        enum: ['ELECTRICAL', 'PLUMBING', 'HVAC', 'CARPENTRY', 'OTHER'],
+        default: 'OTHER'
+    },
+    status: {
+        type: String,
+        enum: ['PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'],
+        default: 'PENDING'
+    },
+    slaTargetResolutionDate: { type: Date, default: null },
+    slaStatus: {
+        type: String,
+        enum: ['IN_COMPLIANCE', 'WARNING', 'BREACHED', 'EXEMPT'],
+        default: 'EXEMPT'
     },
     timeRemainingMinutes: { type: Number, default: null },
 
-    Engineer: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Engineer', 
-    required: true 
+
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    
-    
-},{timestamps:true})
-const Issue=IssueSchema.model('Issue',IssueSchema);
+
+    Engineer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Engineer',
+        required: false // Changed to false because a new complaint won't have an engineer yet
+    },
+
+}, { timestamps: true })
+
+const Issue = mongoose.model('Issue', IssueSchema);
 export default Issue;
