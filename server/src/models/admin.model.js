@@ -12,11 +12,10 @@ const adminSchema = new mongoose.Schema({
     refreshtoken: { type: String }
 }, { timestamps: true });
 
-adminSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+adminSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const rounds = 5;
     this.password = await bcrypt.hash(this.password, rounds);
-    next();
 })
 
 adminSchema.methods.comparePassword = function comparePassword(candidate) {

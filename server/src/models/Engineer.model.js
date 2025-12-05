@@ -18,11 +18,10 @@ const EngineerSchema = new mongoose.Schema({
     avatarUrl: { type: String }
 })
 
-EngineerSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+EngineerSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const rounds = 5;
     this.password = await bcrypt.hash(this.password, rounds);
-    next();
 })
 
 EngineerSchema.methods.comparePassword = function comparePassword(candidate) {

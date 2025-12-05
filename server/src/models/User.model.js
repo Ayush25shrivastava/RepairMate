@@ -13,15 +13,14 @@ const UserSchema = new mongoose.Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    avatarUrl: { type: String }
-
+    avatarUrl: { type: String },
+    refreshtoken: { type: String }
 })
 
-UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+UserSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const rounds = 5;
     this.password = await bcrypt.hash(this.password, rounds);
-    next();
 })
 
 UserSchema.methods.comparePassword = function comparePassword(candidate) {

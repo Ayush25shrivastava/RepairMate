@@ -3,9 +3,6 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import dotenv from "dotenv"
 import { ApiResponse } from "./utility/ApiResponse.js"
-import { ApiError } from "./utility/ApiError.js"
-
-// Import routes
 import engineerRoutes from "./routes/engineer.routes.js"
 import userRoutes from "./routes/user.routes.js"
 import issueRoutes from "./routes/issue.routes.js"
