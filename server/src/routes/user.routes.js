@@ -12,7 +12,7 @@ const router = Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
-// Protected routes
+
 router.post("/logout", verifyJWT, logoutUser);
 
 export default router;

@@ -24,21 +24,21 @@ const generateAccessRefreshToken = async (userId) => {
 };
 
 const RegisterEngineer = asynchandler(async (req, res) => {
-    const { UserName, email, Phone, password, role } = req.body
+    const { name, email, phone, password, role } = req.body
     console.log("getting info", req.body)
-    if ([UserName, email, Phone, password].some((field) => field?.trim() === "")) {
+    if ([name, email, phone, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "all fields are required")
     }
     const exsisteduser = await Engineer.findOne({
-        $or: [{ email }, { Phone }]
+        $or: [{ email }, { phone }]
     })
     if (exsisteduser) {
         throw new ApiError(409, "engineer already exists")
     }
     const engineer = await Engineer.create({
-        name: UserName,
+        name: name,
         email,
-        phone: Phone,
+        phone: phone,
         password,
         role: role || "engineer"
     })

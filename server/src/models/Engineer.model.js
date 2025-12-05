@@ -15,7 +15,8 @@ const EngineerSchema = new mongoose.Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    avatarUrl: { type: String }
+    avatarUrl: { type: String },
+    refreshtoken: { type: String }
 })
 
 EngineerSchema.pre('save', async function () {
