@@ -12,11 +12,11 @@ import { authorizeRoles } from "../middlewares/rbac.middleware.js";
 
 const router = Router();
 
-// Public routes
+
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 
-// Protected routes - require authentication and admin role
+
 router.use(verifyJWT);
 router.use(authorizeRoles("admin"));
 

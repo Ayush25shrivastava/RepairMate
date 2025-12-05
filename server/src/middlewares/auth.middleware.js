@@ -15,7 +15,7 @@ export const verifyJWT = asynchandler(async (req, _, next) => {
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        // Try to find user in all collections
+
         let user = await User.findById(decodedToken?._id).select("-password -refreshtoken");
         let role = "user";
 
