@@ -2,6 +2,7 @@ import { asynchandler } from "../utility/AsyncHandler.js";
 import Engineer from "../models/Engineer.model.js";
 import { ApiError } from "../utility/ApiError.js";
 import { ApiResponse } from "../utility/ApiResponse.js";
+import Issue from "../models/Issue.model.js";
 
 
 const generateAccessRefreshToken = async (userId) => {
@@ -96,10 +97,58 @@ const logoutUser = asynchandler(async (req, res) => {
         .clearCookie("refreshtoken", options)
         .json(new ApiResponse(200, {}, "engineer logged out"))
 })
+const respondToIssue = asynchandler(async (req, res) => {
+    const { issueId, status, comment } = req.body;
+    const engineerId = req.user._id;
+
+    if (!issueId || !status) {
+        throw new ApiError(400, "Issue ID and status are required");
+    }
+
+    const issue = await Issue.findById(issueId);
+
+    if (!issue) {
+        throw new ApiError(404, "Issue not found");
+    }
+
+    if (issue.assignedTo?.toString() !== engineerId.toString()) {
+        throw new ApiError(403, "You are not authorized to respond to this issue");
+    }
+
+    const oldStatus = issue.status;
+    issue.status = status;
+
+    if (comment) {
+        issue.history.push({
+            status: status,
+            comment: comment,
+            updatedBy: engineerId,
+            updatedByRole: "engineer"
+        });
+    }
+
+    if (status === "Resolved" || status === "Closed") {
+        issue.resolvedAt = new Date();
+    }
+
+    await issue.save();
+
+
+    if ((oldStatus !== "Resolved" && oldStatus !== "Closed") && (status === "Resolved" || status === "Closed")) {
+        await Engineer.findByIdAndUpdate(engineerId, { $inc: { currentAssignments: -1 } });
+    } else if ((oldStatus === "Resolved" || oldStatus === "Closed") && (status !== "Resolved" && status !== "Closed")) {
+        await Engineer.findByIdAndUpdate(engineerId, { $inc: { currentAssignments: 1 } });
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, issue, "Issue status updated successfully")
+    );
+});
 export {
     generateAccessRefreshToken,
     RegisterEngineer,
     LoginEngineer,
-    logoutUser
+    logoutUser,
+    respondToIssue
 }
 
