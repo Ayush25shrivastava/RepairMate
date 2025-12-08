@@ -10,11 +10,20 @@ import adminRoutes from "./routes/admin.routes.js"
 
 const app = express()
 dotenv.config()
+
+// Relaxed CORS for development
 app.use(cors({
-    origin: process.env.CORS_ORIGIN === "*" ? true : (process.env.CORS_ORIGIN || "http://localhost:5173"),
+    origin: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }))
+
+// Request Logger
+app.use((req, res, next) => {
+    console.log(`[REQ] ${req.method} ${req.url}`);
+    next();
+});
+
 app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))

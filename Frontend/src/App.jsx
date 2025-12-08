@@ -1,35 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { IssueProvider } from "./context/IssueContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import MainLayout from "./layouts/MainLayout";
+import LandingPage from "./pages/LandingPage";
+import CommanderDashboard from "./pages/CommanderDashboard";
+import RangerDashboard from "./pages/RangerDashboard";
+import OpsDashboard from "./pages/OpsDashboard";
+import LoginModal from "./components/LoginModal";
+import RegisterModal from "./components/RegisterModal";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Helper to route users to their correct dashboard
+const RoleBasedRedirect = () => {
+  const { user } = useAuth();
+  if (user.role === 'admin') return <Navigate to="/commander" replace />;
+  if (user.role === 'engineer') return <Navigate to="/ops" replace />;
+  return <Navigate to="/ranger" replace />;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AuthProvider>
+      <IssueProvider>
+        <Router>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Secured Ops Hub Routes */}
+            <Route element={<MainLayout />}>
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <RoleBasedRedirect />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                 path="/commander" 
+                 element={<ProtectedRoute role="admin"><CommanderDashboard /></ProtectedRoute>} 
+              />
+              <Route 
+                 path="/ranger" 
+                 element={<ProtectedRoute role="user"><RangerDashboard /></ProtectedRoute>} 
+              />
+              <Route 
+                 path="/ops" 
+                 element={<ProtectedRoute role="engineer"><OpsDashboard /></ProtectedRoute>} 
+              />
+            </Route>
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          
+          <ToastContainer position="bottom-right" theme="dark" toastClassName="bg-space-800 text-white border border-space-700" />
+          <LoginModal />
+          <RegisterModal />
+        </Router>
+      </IssueProvider>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
